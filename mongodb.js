@@ -42,6 +42,10 @@ async function main() {
     //   }
     // })
 
+    const response = await db.collection('tasks').deleteOne({
+      description : "task-1"
+    })
+
     console.log(response)
 
 
