@@ -1,5 +1,5 @@
 const { error } = require('console');
-const { MongoClient, ObjectID } = require('mongodb')
+const { MongoClient, ObjectId } = require('mongodb')
 
 const connectionURL = "mongodb://0.0.0.0:27017";
 const databaseName = "task-manager";
@@ -11,45 +11,43 @@ async function main() {
     await client.connect();
     const db = client.db(databaseName);
 
-    // const result = await db.collection('users').insertOne({
-    //     name: 'Shubham',
-    //     age: 20
+    // db.collection('users').updateOne({
+    //   _id: new ObjectId("65d7231cefe5dbe284e6661a")
+    // }, {
+    //   $set: {
+    //     name: "Akshay" 
+    //   }
+    // }).then((result)  => {
+    //   console.log(result);
+    // }).catch((error) => {
+    //   console.log(error);
     // })
 
-    // const result = await db.collection("tasks").insertMany([
-    //   {
-    //     description: "task-1",
-    //     completed: false,
+    // const updateResponse = await db.collection('users').updateOne({
+    //   _id: new ObjectId("65d7231cefe5dbe284e6661a")
+    // }, {
+    //   $set: {
+    //     name: "Mike"
     //   },
-    //   {
-    //     description: "task-2",
-    //     completed: true,
-    //   },
-    //   {
-    //     description: "task-3",
-    //     completed: false,
-    //   },
-    // ]);
+    //   $inc: {
+    //     age: 1
+    //   }
+    // })
 
-    db.collection('users').findOne({ name: 'Shubwham' }).then((error, result) => {
-        if (error) {
-            return console.log("Unable to fetch.");
-        }
+    // const response = await db.collection('tasks').updateMany({
+    //   completed: false,
+    // }, {
+    //   $set: {
+    //     completed: true
+    //   }
+    // })
 
-        if (!result) {
-            return console.log('NO data found');
-        }
-
-        console.log(result);
-    })
-
-    db.collection('tasks').find( { completed : false } ).toArray().then((data) => {
-        console.log(data);
-    })
+    console.log(response)
 
 
-
+   
   } catch (e) {
+    console.log(e);
     console.log("Unnable to connect.");
   }
 }
