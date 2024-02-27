@@ -1,6 +1,6 @@
 const express = require("express");
 const User = require("../models/user");
-var jwt = require("jsonwebtoken");
+const auth = require('../middleware/auth')
 
 const router = new express.Router();
 
@@ -9,7 +9,7 @@ router.post("/users", async (req, res) => {
 
   try {
     await user.save();
-    const token = await user.generateAuthToken();
+    const token = await user.generateAuthToken(); 
 
     res.status(201).send({ user, token });
   } catch (e) {
@@ -31,13 +31,8 @@ router.post("/users/login", async (req, res) => {
   }
 });
 
-router.get("/users", async (req, res) => {
-  try {
-    const user = await User.find({});
-    res.send(user);
-  } catch (e) {
-    res.send(500).send();
-  }
+router.get("/users/me", auth, async (req, res) => {
+  res.send(req.user)
 });
 
 router.get("/users/:id", (req, res) => {
