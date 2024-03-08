@@ -2,66 +2,72 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
-const Task = require('../models/task')
+const Task = require("../models/task");
 
-const userSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  email: {
-    type: String,
-    trim: true,
-    lowercase: true,
-    unique: true,
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error("Invalid email.");
-      }
+const userSchema = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
-  },
-  password: {
-    type: String,
-    required: true,
-    trim: true,
-    minLength: 7,
-    validate(value) {
-      if (value.toLowerCase().includes("password")) {
-        throw new Error("Must not contain word password");
-      }
-    },
-  },
-  age: {
-    type: Number,
-    default: 0,
-    validate(value) {
-      if (value < 0) {
-        throw new Error("age must be +ve");
-      }
-    },
-  },
-  tokens: [
-    {
-      token: {
-        type: String,
-        requried: true,
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      unique: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email.");
+        }
       },
     },
-  ],
-},
-{
-  toObject: { virtuals: true },
-  toJSON: { virtuals: true }
-}, {
-  timestamps: true
-});
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+      minLength: 7,
+      validate(value) {
+        if (value.toLowerCase().includes("password")) {
+          throw new Error("Must not contain word password");
+        }
+      },
+    },
+    age: {
+      type: Number,
+      default: 0,
+      validate(value) {
+        if (value < 0) {
+          throw new Error("age must be +ve");
+        }
+      },
+    },
+    tokens: [
+      {
+        token: {
+          type: String,
+          requried: true,
+        },
+      },
+    ],
+    avatar: {
+      type: Buffer,
+    },
+  },
+  {
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-userSchema.virtual('tasks', {
-  ref: 'Task',
-  localField: '_id',
-  foreignField: 'owner'
-})
+userSchema.virtual("tasks", {
+  ref: "Task",
+  localField: "_id",
+  foreignField: "owner",
+});
 
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
@@ -73,14 +79,15 @@ userSchema.methods.generateAuthToken = async function () {
 };
 
 userSchema.methods.toJSON = function () {
-  const user = this.toObject()
+  const user = this.toObject();
 
-  delete user.password
-  delete user.tokens
-  delete user.id
+  delete user.password;
+  delete user.tokens;
+  delete user.id;
+  delete user.avatar;
 
-  return user
-}
+  return user;
+};
 userSchema.statics.findByCredentials = async (email, password) => {
   const user = await User.findOne({ email });
 
@@ -107,11 +114,15 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.pre("deleteOne", { document: true, query: false }, async function (next) {
-  const user = this
-  await Task.deleteMany({ owner: user._id })
-  next()
-})
+userSchema.pre(
+  "deleteOne",
+  { document: true, query: false },
+  async function (next) {
+    const user = this;
+    await Task.deleteMany({ owner: user._id });
+    next();
+  }
+);
 
 const User = mongoose.model("User", userSchema);
 
